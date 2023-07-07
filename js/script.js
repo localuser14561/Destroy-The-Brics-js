@@ -1,84 +1,251 @@
+let canvas = document.getElementById('holst')
+let oblast = canvas.getContext("2d")
 
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d")
+let x = canvas.width / 2;
+let y = canvas.height - 50;
 
-const ground = new Image();
-ground.src = "img/ground.png";
-const foodImg = new Image();
+let dx = 10
+let dy = 10
+let ballRadius = 15
 
-foodImg.src = "img/food.png";
+let platformHeight = 20
+let platformWidth = 220
 
-let box = 32;
+let platformX = (canvas.width-platformWidth)/ 2
 
-let score = 0;
+let right = false
+let left = false
 
-let food = {
-	x: Math.floor((Math.random() * 17 + 1)) * box,
-	y: Math.floor((Math.random() * 15 + 3)) * box,
-};
-let snake = [];
-snake[0 ]= {
-    x : 9 * box,
-    y : 10 * box
-};
-document.addEventListener("keydown",direction);
-let dir;
-function direction(event){
-    if(event.keyCode == 37 && dir !="right")
-    dir = "left";
-   else if(event.keyCode == 38 && dir !="down")
-    dir = "up";
-    else if(event.keyCode == 39 && dir !="left")
-    dir = "right";
-    else if(event.keyCode == 40 && dir !="up")
-    dir = "down";
+document.addEventListener("keydown", pressDown, false)
+document.addEventListener("keyup", pressUp, false)
+
+function pressDown(e)
+{
+	if(e.key == "Right" || e.key == "d")
+	{
+		right = true
+	}
+	else if(e.key == "Left" || e.key == "a")
+	{
+		left = true
+	}
 }
-function eatTail(head, arr){
-	for(let i=0;i<arr.length; i++){
-		if(head.x==arr[i].x && head.y==arr[i].y)
-			clearInterval(game);
+function pressUp(e)
+{
+	if(e.key == "Right" || e.key == "d")
+	{
+		right = false
+	}
+	else if(e.key == "Left" || e.key == "a")
+	{
+		left = false
 	}
 }
 
-function drawGame(){
-    ctx.drawImage(ground, 0, 0);
-ctx.drawImage(foodImg, food.x, food.y);
+function drawFrame(){
+	
+	oblast.clearRect(0,0, canvas.width, canvas.height)
+	oblast.beginPath()
+	oblast.arc(x, y, ballRadius,0, Math.PI * 2, false)
+	oblast.fillStyle = "red"
+	oblast.fill()
+	oblast.closePath()
 
-for(let i = 0; i < snake.length; i++){
-	ctx.fillStyle = i == 0 ? "blue" : "yellow";
-ctx.fillRect(snake[i].x, snake[i].y, box, box);
+	oblast.beginPath()
+	oblast.rect(platformX, canvas.height- platformHeight - 20, platformWidth, platformHeight)
+	oblast.fillStyle = "red"
+	oblast.fill()
+	oblast.closePath()
+
+	proverkaSten()
+	drowBlock()
+	destroy()
+	drawScore()
+	drawLives()
+	
+	if(right == true)
+	{
+		platformX += 7
+		if(platformX + platformWidth > canvas.width)
+		{
+			platformX = canvas.width-platformWidth
+		}
+	}
+	else if(left == true)
+	{
+		platformX -= 7
+		if (platformX<0)
+		{
+			platformX = 0
+		}
+	}
+x += dx
+	y += dy
+}
+function Startgame()
+{
+	let start = document.getElementById('start')
+	let holst = document.getElementById('holst')
+	start.style.display='none'
+	holst.style.display="block"
+interval = setInterval(drawFrame,10)
+}
+function win(score)
+{
+	let holst = document.getElementById('holst')
+	let p = document.getElementById('score')
+	let win = document.getElementById('win')
+	holst.style.display='none'
+	win.style.display="block"
+	p.innerText = "Набрали очков" + score
 
 }
-    ctx.fillStyle = "white";
-	ctx.font = "50px Arial"; 
-	ctx.fillText(score, box * 2.5, box * 1.7);
-
-	let snakeX = snake[0].x;
-	let snakeY = snake[0].y;
-    if(snakeX == food.x && snakeY == food.y){
-        score ++;
-        food = {
-            x: Math.floor((Math.random() * 17+ 1 )) * box,
-            y: Math.floor((Math.random() * 15+ 3 )) * box,
-            
-
-        }
-    } else
-    snake.pop();
-    if(snakeX<box||snakeX>box*17||snakeY<3*box||snakeY>box*17)
-		clearInterval(game);
-
-	if(dir=="left") snakeX-=box
-	if(dir=="right") snakeX+=box
-	if(dir=="up") snakeY-=box
-	if(dir=="down") snakeY+=box
-
-	let newHead={
-		x: snakeX,
-		y: snakeY
-	};
-
-	eatTail(newHead,snake);
-	snake.unshift(newHead);
+function lose(score)
+{
+	let holst = document.getElementById('holst')
+	let p = document.getElementById('score')
+	let lose = document.getElementById('lose')
+	holst.style.display='none'
+lose.style.display="block"
+	p.innerText = "Набрали очков" + score
+	
 }
-let game = setInterval(drawGame,125);
+
+
+
+let interval
+
+
+function proverkaSten()
+{
+	if (x+dx > canvas.width - ballRadius || x + dx < ballRadius)
+	{
+		dx = -dx
+	}
+	if (y + dy < ballRadius)
+	{
+		dy= -dy
+	}
+	if (y+dy > canvas.height - ballRadius - 20)
+	{
+		if(x>platformX && x<platformX+platformWidth)
+		{
+			dy=-dy
+
+			// Звук отскока
+			zvykotsoka.play()
+		}
+		else
+		{
+			--lives
+			dy=-dy
+			let random = Math.random()*(3-1)-1
+
+			if(random==2)
+			{
+				dx=-dx
+			}
+
+
+
+
+			if(!lives)
+			{
+				lose(score)
+			clearInterval(interval)
+			}
+			
+		}
+		
+	}
+}
+
+let blocksRow = 5
+let blocksColumn = 7
+
+let blockHeight = 35
+let blockWidth = 150
+
+let blockMargin = 15
+
+let blockLeft = 30
+let blockTop = 30
+
+let bricks = []
+	
+for (let i = 0;i < blocksColumn; i++)
+{
+	bricks[i] = []
+
+	for(let j = 0; j < blocksRow; j++)
+	{
+		bricks[i][j] = {x:0, y:0, status: 1}
+	}
+}
+
+function drowBlock()
+{
+	for(let i = 0;i < blocksColumn; i++)
+		for(let j = 0;j < blocksRow; j++)
+		{
+			if(bricks[i][j].status == 1)
+			{
+				let bX = i * (blockWidth + blockMargin) + blockLeft
+				let bY = j * (blockHeight + blockMargin) + blockTop
+
+				bricks[i][j].x = bX;
+				bricks[i][j].y = bY;	
+
+				oblast.beginPath()
+					oblast.rect(bX, bY,blockWidth, blockHeight)
+					oblast.fillStyle = "red"
+					oblast.fill()
+				oblast.closePath()
+			}
+		}
+}
+
+
+function destroy()
+{
+    for(let i = 0;i < blocksColumn; i++)
+        for(let j = 0; j < blocksRow; j++)
+            {
+               let b = bricks[i][j]
+               if(b.status == 1)
+               {
+                 if( x > b.x && x < b.x + blockWidth && y> b.y && y < b.y + blockHeight)
+                 {
+                    dy = -dy;
+                    b.status = 0
+                    score++
+                    if(score === 35) {
+                    	alert("Game Over, You WIN!")
+                    	// Звук выиграша
+
+                    	document.location.reload()
+                    	clearInterval(interval)
+                    }
+                 }
+               }  
+            }
+}
+
+let score = 0
+function drawScore()
+{
+	oblast.font = "16px Arial"
+	oblast.fillStyle = "red"
+	oblast.fillText("Score:" + score, 8, 20)
+}
+
+var zvykotsoka = new Audio('./mp3/otskok.mp3')
+let lives = 3 
+
+function drawLives()
+{
+	oblast.font = "16px Arial"
+	oblast.fillStyle= "red"
+	oblast.fillText("Lives:" + lives, 1100,20)
+	
+}

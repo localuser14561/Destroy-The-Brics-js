@@ -1,0 +1,29 @@
+body{
+	background: linear-gradient(to right, darkblue, purple);
+	padding: 50px;
+	margin: 0 auto;
+}
+#holst{
+	display: block;
+	margin: 0 auto;
+	border: 3px solid red;
+	display: none;
+}
+.btn_start{
+	width: 200px;
+	height: 100px;
+	border: 2px solid red;
+	margin: 0 auto;
+	
+
+
+}
+.start{
+	width: 1200px;
+	height: 600px;
+	margin: 0 auto;
+	border: 2px solid red;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}

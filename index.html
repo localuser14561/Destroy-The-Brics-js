@@ -1,13 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title></title>
-<link rel="stylesheet" href="css/style.css">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Destroy The Bricks!</title>
+	<link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
 <body>
-
-<canvas id="game" width="608" height="608"></canvas>
-
- <script src="js/script.js"></script>
+	<div class="start" id="start">
+		<button class="btn_start" onclick="Startgame()">Start Game</button>
+	</div>
+	<canvas id="holst" width="1200" height="600"></canvas>
+	<div class="win" id="win"><p id="score"></p></div>
+	<div class="lose" id="lose"><p id="score"></p></div>
+<script type="text/javascript" src="js/script.js"></script>
 </body>
-</html>
+</html>			
